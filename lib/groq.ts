@@ -36,6 +36,7 @@ A Nota de Otimização deve:
 - Contextualizar os dados dentro do que já foi feito anteriormente (referenciando o histórico quando pertinente).
 - Ser objetiva, mas não superficial. Se há algo importante, diga com clareza.
 - **Não fazer recomendações dentro da Nota** — esse espaço é puramente descritivo e analítico.
+- **Apresentar os apontamentos em formato de bullet list**, para facilitar a leitura — assim como já é feito na seção de Recomendação. O estilo, o vocabulário e o tom do histórico do gestor devem ser preservados; a única mudança é estrutural (parágrafos → bullets).
 
 ---
 
