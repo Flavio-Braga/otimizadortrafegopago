@@ -1,16 +1,21 @@
-import Anthropic from "@anthropic-ai/sdk";
+import Groq from "groq-sdk";
 
 /**
- * Cliente Anthropic compartilhado. A chave é lida da variável de ambiente
- * ANTHROPIC_API_KEY (configurada localmente em .env.local e na Vercel em
- * Settings -> Environment Variables). Nunca exponha a chave no client.
+ * Cliente Groq compartilhado. A chave é lida da variável de ambiente
+ * GROQ_API_KEY (configurada localmente em .env.local e na Vercel em
+ * Settings -> Environment Variables). Nunca exponha a chave no client —
+ * ela só é usada aqui, no servidor (API Route).
  */
-export const anthropic = new Anthropic({
-  apiKey: process.env.ANTHROPIC_API_KEY,
+export const groq = new Groq({
+  apiKey: process.env.GROQ_API_KEY,
 });
 
-/** Modelo usado para a análise. */
-export const MODEL = "claude-sonnet-4-20250514";
+/**
+ * Modelo usado para a análise. Pode ser sobrescrito pela variável de
+ * ambiente GROQ_MODEL sem alterar o código. Padrão: Llama 3.3 70B.
+ * Veja os modelos disponíveis em https://console.groq.com/docs/models
+ */
+export const MODEL = process.env.GROQ_MODEL || "llama-3.3-70b-versatile";
 
 export const SYSTEM_PROMPT = `Você é um analista especialista em tráfego pago. Sua função é interpretar o histórico de otimizações de uma conta e os dados de desempenho recentes para produzir dois outputs estruturados: uma **Nota de Otimização** e uma **Recomendação direta ao Gestor de Tráfego**.
 

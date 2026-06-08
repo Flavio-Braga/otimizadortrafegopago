@@ -1,6 +1,6 @@
 # Otimizador de Tráfego Pago
 
-Ferramenta web que transforma o **histórico de otimizações** de uma conta de tráfego pago e o **relatório de desempenho dos últimos 7 dias** em dois outputs estruturados, gerados pela API da Anthropic:
+Ferramenta web que transforma o **histórico de otimizações** de uma conta de tráfego pago e o **relatório de desempenho dos últimos 7 dias** em dois outputs estruturados, gerados por IA:
 
 - **Nota de Otimização** — análise descritiva no estilo das notas históricas do gestor.
 - **Recomendação** — dividida em "Ação imediata" e "Fique de olho".
@@ -15,7 +15,7 @@ A aplicação é **stateless**: nenhum dado é armazenado em servidor ou banco.
 
 - [Next.js](https://nextjs.org/) 15 (App Router) + TypeScript
 - Tailwind CSS + `@tailwindcss/typography`
-- [`@anthropic-ai/sdk`](https://www.npmjs.com/package/@anthropic-ai/sdk) (modelo `claude-sonnet-4-20250514`)
+- [`groq-sdk`](https://www.npmjs.com/package/groq-sdk) — inferência via [Groq](https://groq.com/) (modelo padrão `llama-3.3-70b-versatile`)
 - `react-markdown` + `remark-gfm` para renderizar o resultado
 - Deploy na [Vercel](https://vercel.com/)
 
@@ -26,7 +26,7 @@ A aplicação é **stateless**: nenhum dado é armazenado em servidor ou banco.
 ### 1. Pré-requisitos
 
 - Node.js 18.18+ (recomendado 20+)
-- Uma chave da API da Anthropic — gere em <https://console.anthropic.com/>
+- Uma chave da API do Groq — gere **gratuitamente** em <https://console.groq.com/keys>
 
 ### 2. Instalar dependências
 
@@ -51,7 +51,7 @@ Copy-Item .env.local.example .env.local
 Edite o `.env.local`:
 
 ```
-ANTHROPIC_API_KEY=sk-ant-...
+GROQ_API_KEY=gsk_...
 ```
 
 > O arquivo `.env.local` está no `.gitignore` e **nunca** deve ser commitado.
@@ -75,6 +75,15 @@ Abra <http://localhost:3000>.
 
 ---
 
+## Variáveis de ambiente
+
+| Nome | Obrigatória | Descrição |
+| --- | --- | --- |
+| `GROQ_API_KEY` | Sim | Chave da API do Groq (<https://console.groq.com/keys>). |
+| `GROQ_MODEL` | Não | Modelo do Groq. Padrão: `llama-3.3-70b-versatile`. [Lista de modelos](https://console.groq.com/docs/models). |
+
+---
+
 ## Deploy na Vercel
 
 1. Faça o push do projeto para o repositório do GitHub.
@@ -83,7 +92,7 @@ Abra <http://localhost:3000>.
 
    | Nome | Valor |
    | --- | --- |
-   | `ANTHROPIC_API_KEY` | sua chave da Anthropic |
+   | `GROQ_API_KEY` | sua chave do Groq |
 
 4. Faça o deploy. A rota `/api/analyze` roda no runtime Node com `maxDuration` de 60s para suportar o streaming.
 
@@ -97,12 +106,12 @@ Abra <http://localhost:3000>.
 │   ├── layout.tsx              # Fontes (Sora + JetBrains Mono) e metadata
 │   ├── page.tsx                # UI principal: upload, streaming, resultado
 │   ├── globals.css             # Tailwind + tema escuro
-│   └── api/analyze/route.ts    # API Route que chama a Anthropic (streaming)
+│   └── api/analyze/route.ts    # API Route que chama o Groq (streaming)
 ├── components/
 │   ├── FileUpload.tsx          # Upload dos dois arquivos (.md e .csv)
 │   ├── ResultDisplay.tsx       # Renderiza o markdown do resultado
 │   └── DownloadButton.tsx      # Baixa o resultado como nota-otimizacao.md
 ├── lib/
-│   └── anthropic.ts            # Cliente Anthropic + SYSTEM_PROMPT
-└── .env.local.example          # Exemplo da variável de ambiente
+│   └── groq.ts                 # Cliente Groq + SYSTEM_PROMPT
+└── .env.local.example          # Exemplo das variáveis de ambiente
 ```

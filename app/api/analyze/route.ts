@@ -1,7 +1,7 @@
-import { anthropic, MODEL, SYSTEM_PROMPT } from "@/lib/anthropic";
+import { groq, MODEL, SYSTEM_PROMPT } from "@/lib/groq";
 
-// Roda no runtime Node (necessário para o SDK da Anthropic) e permite
-// respostas em streaming mais longas no deploy da Vercel.
+// Roda no runtime Node e permite respostas em streaming mais longas
+// no deploy da Vercel.
 export const runtime = "nodejs";
 export const maxDuration = 60;
 
@@ -13,9 +13,9 @@ function jsonError(message: string, status: number): Response {
 }
 
 export async function POST(req: Request): Promise<Response> {
-  if (!process.env.ANTHROPIC_API_KEY) {
+  if (!process.env.GROQ_API_KEY) {
     return jsonError(
-      "ANTHROPIC_API_KEY não configurada no servidor. Defina a variável de ambiente e tente novamente.",
+      "GROQ_API_KEY não configurada no servidor. Defina a variável de ambiente e tente novamente.",
       500,
     );
   }
@@ -59,24 +59,25 @@ ${csvContent}
 Produza a Nota de Otimização e a Recomendação conforme as instruções.`;
 
   try {
-    const messageStream = await anthropic.messages.create({
+    const completion = await groq.chat.completions.create({
       model: MODEL,
       max_tokens: 4096,
-      system: SYSTEM_PROMPT,
+      temperature: 0.6,
       stream: true,
-      messages: [{ role: "user", content: userMessage }],
+      messages: [
+        { role: "system", content: SYSTEM_PROMPT },
+        { role: "user", content: userMessage },
+      ],
     });
 
     const encoder = new TextEncoder();
     const readable = new ReadableStream<Uint8Array>({
       async start(controller) {
         try {
-          for await (const event of messageStream) {
-            if (
-              event.type === "content_block_delta" &&
-              event.delta.type === "text_delta"
-            ) {
-              controller.enqueue(encoder.encode(event.delta.text));
+          for await (const chunk of completion) {
+            const text = chunk.choices[0]?.delta?.content;
+            if (text) {
+              controller.enqueue(encoder.encode(text));
             }
           }
           controller.close();
@@ -95,7 +96,7 @@ Produza a Nota de Otimização e a Recomendação conforme as instruções.`;
     });
   } catch (err) {
     const message =
-      err instanceof Error ? err.message : "Erro desconhecido ao chamar a API da Anthropic.";
+      err instanceof Error ? err.message : "Erro desconhecido ao chamar a API do Groq.";
     return jsonError(message, 502);
   }
 }
