@@ -15,7 +15,7 @@ export const groq = new Groq({
  * ambiente GROQ_MODEL sem alterar o código. Padrão: Llama 3.3 70B.
  * Veja os modelos disponíveis em https://console.groq.com/docs/models
  */
-export const MODEL = process.env.GROQ_MODEL || "llama-3.3-70b-versatile";
+export const MODEL = process.env.GROQ_MODEL || "openai/gpt-oss-120b";
 
 export const SYSTEM_PROMPT = `Você é um analista especialista em tráfego pago. Sua função é interpretar o histórico de otimizações de uma conta e os dados de desempenho recentes para produzir dois outputs estruturados: uma **Nota de Otimização** e uma **Recomendação direta ao Gestor de Tráfego**.
 
